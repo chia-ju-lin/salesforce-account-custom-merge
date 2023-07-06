@@ -1,18 +1,23 @@
-# Salesforce DX Project: Next Steps
+# Purpose of the Project: 
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+The functionality is similar to the standard salesfoce merge function.
+This project provids the following functionality.
+- UI to allow two manual input for the account IDs
+- Display all fieds which have differnt values between the two accouts for the selection
+*Please not that all Date, DateTime and not editable fields are not displaied
 
-## How Do You Plan to Deploy Your Changes?
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+## Child Object Customization
 
-## Configure Your Salesforce DX Project
+Modify the code under force-app/main/default/classes/AccountMergeController.cls 
+-specify the child object
+-specify the exernal ID
+![Alt text](image-1.png)
+![Alt text](image.png)
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+## Disable Merge Conditon Customization
+
+Modify the code under force-app/main/default/classes/AccountMergeController.cls
+![Alt text](image-2.png)
 
 ## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)

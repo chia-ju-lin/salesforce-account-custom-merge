@@ -32,7 +32,7 @@ public class AccountMergeController {
         String soqlQuery2 = 'SELECT ' + metadataFields + ' FROM Account WHERE Id = \'' + mergedAccountId + '\' LIMIT 1';
         mergedAccount = Database.query(soqlQuery2);
 
-                // Initialize the selected values map
+        // Initialize the selected values map
         selectedFieldValues = new Map<String, Object>();
 
         // Populate the selected values for each field
@@ -43,7 +43,7 @@ public class AccountMergeController {
             } else if (mergedAccount.get(field) != null) {
                 selectedFieldValues.put(field, mergedAccount.get(field));
             }
-}
+        }
     }
 
     private List<String> getDifferentFields() {
@@ -56,8 +56,7 @@ public class AccountMergeController {
             if (masterValue != mergedValue) {
                 df.add(fieldName);
             }
-        }
-    
+        }    
         return df;
     }
 
@@ -76,37 +75,66 @@ public class AccountMergeController {
                     selectedValue = Double.valueOf((String) selectedValue);
                 } else if (fieldType == Schema.DisplayType.BOOLEAN) {
                     selectedValue = Boolean.valueOf((String) selectedValue);
-                } /*
-                else if (fieldType == Schema.DisplayType.DATE) {
-                    selectedValue = Date.valueOf((String) selectedValue);
-                } else if (fieldType == Schema.DisplayType.DATETIME) {
-                    selectedValue = DateTime.valueOf((String) selectedValue);
-                }
-                */
+                } 
             }
     
             masterAccount.put(field, selectedValue);
-        }
-    
-        // Save the updated master account and perform other operations
-        update masterAccount;
+        }         
 
-        //TODO: 
-        // 1. update master with selected values
-        // 2. insert merged child into master
-        // 3. delete merged child
-        // 4. merge    
-        // 5. rollback the above if merge fail    
+        // 1. Savepoint before perform other operations
+        Savepoint sp = Database.setSavepoint();       
         
-       
-       isMerged = true;
-       mergeMessage = 'Merge successful!';       
+        try{
+            // 2. update master with selected values            
+            update masterAccount;
+
+            // 3. move childs from merged account into master account            
+            List<String> childObjectNames = new List<String>();
+            // TODO: Set the child objects
+            childObjectNames.add('Opportunity');
+
+            moveChildRecords(masterAccountId, mergedAccountId, childObjectNames);
+
+            // 4. perform merge            
+            Account updatedMasterAccount = [SELECT Id, Name FROM Account WHERE Id = :masterAccountId LIMIT 1];           
+            Database.merge(updatedMasterAccount, mergedAccount, true);
+
+            isMerged = true;
+            mergeMessage = 'Merge successful!';
+
+        }catch (Exception ex){
+
+            // 5. rollback 2,3,4 if merge fail  
+            Database.rollback(sp);
+            mergeMessage = 'Merge fail!'+ex;
+            isMerged = true; 
+        }         
     }
-    
+
+    public void moveChildRecords(Id masterAccountId, Id mergedAccountId, List<String> childObjectNames) {
+        // Iterate over each child object name in the list
+        for (String childObjectName : childObjectNames) {
+            // Prepare the dynamic SOQL query to retrieve child records for the merged account
+            String soqlQuery = 'SELECT Id FROM ' + childObjectName + ' WHERE AccountId = :mergedAccountId';
+            
+            // Query the child records dynamically
+            List<SObject> childRecords = Database.query(soqlQuery);
+            
+            // Move child records to the master account
+            for (SObject childRecord : childRecords) {
+                // TODO:Set the master account as the new parent
+                childRecord.put('AccountId', masterAccountId);                
+                
+                // Insert the child record under the master account
+                Database.update(childRecord);
+            }
+        }
+    }   
 
     public Boolean getDisableMergeButton() {         
         // if ERP(or EBP) ID exist in both master and merged         
         // if ERP(or EBP) in both master and merged are both empty
+        // TODO: Set actual extrnalID custom fields
         
         Boolean isMasterERPIdEmpty = String.isBlank(masterAccount.ExternalID__c);
         Boolean isMergedERPIdEmpty = String.isBlank(mergedAccount.ExternalID__c);
