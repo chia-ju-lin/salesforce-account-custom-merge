@@ -1,0 +1,28 @@
+<apex:page controller="AccountMergeController">
+    <apex:form rendered="{!NOT isMerged}">
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Master Account</th>
+                <th>Merged Account</th>
+            </tr>
+            <apex:repeat value="{!differentFields}" var="field">
+                <tr>
+                    <td>{!field}</td>
+                    <td>
+                       <apex:selectRadio value="{!selectedFieldValues[field]}" >
+                            <apex:selectOption itemValue="{!masterAccount[field]}" itemLabel="{!masterAccount[field]}" />
+                            <apex:selectOption itemValue="{!mergedAccount[field]}" itemLabel="{!mergedAccount[field]}" />
+                        </apex:selectRadio>
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
+        <apex:commandButton value="Merge" action="{!mergeAccounts}" disabled="{!disableMergeButton}" />
+    </apex:form>
+   <apex:outputPanel rendered="{!isMerged}">
+        <div class="success-message">
+            {!mergeMessage}
+        </div>
+    </apex:outputPanel>
+</apex:page>

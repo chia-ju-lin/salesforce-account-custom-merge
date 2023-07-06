@@ -1,0 +1,24 @@
+<template>
+    <template if:true={isMerged}>
+        <div class="success-message">
+            {mergeMessage}
+        </div>
+    </template>
+    <template if:false={isMerged}>
+        <lightning-card title="Account Merge">
+            <div if:true={selectedFieldValueOptions}>
+                <div for:each={selectedFieldValueOptions} for:item="option" key={option.value} class="slds-form-element">
+                    <label class="slds-form-element__label">{option.label}</label>
+                    <div class="slds-form-element__control">
+                        <lightning-radio-group name={option.value} value={option.selectedValue} options={radioOptions} onchange={handleFieldChange}></lightning-radio-group>
+                        <span class="slds-form-element__static">{option.masterValue}</span>
+                        <span class="slds-form-element__static">{option.mergedValue}</span>
+                    </div>
+                </div>
+                <div class="slds-m-top_medium">
+                    <lightning-button variant="brand" label="Merge" onclick={mergeAccounts} disabled={disableMergeButton}></lightning-button>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+</template>

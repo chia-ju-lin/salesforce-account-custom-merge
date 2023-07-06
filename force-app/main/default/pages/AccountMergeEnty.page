@@ -1,0 +1,33 @@
+<apex:page controller="AccountMergeEntryController">
+    <apex:slds />
+
+    <apex:form >
+        <div class="slds-grid slds-wrap slds-grid--align-center">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Master Account ID:</label>
+                    <div class="slds-form-element__control">
+                        <apex:inputText styleClass="slds-input" value="{!masterAccountId}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Merged Account ID:</label>
+                    <div class="slds-form-element__control">
+                        <apex:inputText styleClass="slds-input" value="{!mergedAccountId}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <apex:commandButton styleClass="slds-button slds-button_brand" value="Merge" action="{!redirectToMergePage}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>
