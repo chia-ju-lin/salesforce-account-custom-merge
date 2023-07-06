@@ -3,7 +3,7 @@
     <apiVersion>58.0</apiVersion>
     <availableInTouch>true</availableInTouch>
     <confirmationTokenRequired>false</confirmationTokenRequired>
-    <label>Account Merge Entry</label>
+    <label>Merge Entry</label>
     <packageVersions>
         <majorNumber>1</majorNumber>
         <minorNumber>20</minorNumber>
