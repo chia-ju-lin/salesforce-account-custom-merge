@@ -61,6 +61,34 @@ public class AccountMergeController {
     }
 
     public void mergeAccounts() {
+        
+        isMerged = true;
+        // Savepoint before performing any operations
+        Savepoint sp = Database.setSavepoint();
+        
+        try {            
+    
+            // Update merged account for unique fields to prevent duplication error when updating master
+            updateUniqueFieldsInMergedAccountAndPrepareMasterAccount();
+    
+            // Update master with selected values
+            update masterAccount;
+    
+            // Move child records from merged account into master account
+            moveChildRecordsToMasterAccount();
+    
+            // Perform merge
+            performMerge();
+            mergeMessage = 'Merge successful!';
+        } catch (Exception ex) {
+
+            // Handle exception and rollback if necessary            
+            mergeMessage = 'Merge failed! ' + ex.getMessage();
+            Database.rollback(sp);
+        }         
+    }
+
+    private void updateUniqueFieldsInMergedAccountAndPrepareMasterAccount() {
         // Retrieve the selected field values
         for (String field : differentFields) {
             Object selectedValue = selectedFieldValues.get(field);
@@ -70,46 +98,43 @@ public class AccountMergeController {
                 Schema.DisplayType fieldType = fieldDescribe.getType();
     
                 if (fieldType == Schema.DisplayType.INTEGER) {
-                    selectedValue = Integer.valueOf((String) selectedValue);
+                    selectedValue = Integer.valueOf((String) selectedValue);                    
                 } else if (fieldType == Schema.DisplayType.DOUBLE) {
                     selectedValue = Double.valueOf((String) selectedValue);
                 } else if (fieldType == Schema.DisplayType.BOOLEAN) {
                     selectedValue = Boolean.valueOf((String) selectedValue);
                 } 
+                
+                // Check if the field is unique and update the merged account's field 
+                if (fieldDescribe.isUnique() && (fieldType == Schema.DisplayType.INTEGER || fieldType == Schema.DisplayType.DOUBLE)) {
+                    mergedAccount.put(field, 0);
+                }else if (fieldDescribe.isUnique()){
+                    mergedAccount.put(field, 'tempValue');
+                }
             }
     
             masterAccount.put(field, selectedValue);
-        }         
-
-        // 1. Savepoint before perform other operations
-        Savepoint sp = Database.setSavepoint();       
-        
-        try{
-            // 2. update master with selected values            
-            update masterAccount;
-
-            // 3. move childs from merged account into master account            
-            List<String> childObjectNames = new List<String>();
-            // TODO: Set the child objects
-            childObjectNames.add('Opportunity');
-
-            moveChildRecords(masterAccountId, mergedAccountId, childObjectNames);
-
-            // 4. perform merge            
-            Account updatedMasterAccount = [SELECT Id, Name FROM Account WHERE Id = :masterAccountId LIMIT 1];           
-            Database.merge(updatedMasterAccount, mergedAccount, true);
-
-            isMerged = true;
-            mergeMessage = 'Merge successful!';
-
-        }catch (Exception ex){
-
-            // 5. rollback 2,3,4 if merge fail  
-            Database.rollback(sp);
-            mergeMessage = 'Merge fail!'+ex;
-            isMerged = true; 
-        }         
+        }
+    
+        // Update merged account with the unique field values
+        update mergedAccount;
     }
+    
+
+    private void moveChildRecordsToMasterAccount() {
+        List<String> childObjectNames = new List<String>();
+        // TODO: Set the child objects
+        childObjectNames.add('Opportunity');
+
+        moveChildRecords(masterAccountId, mergedAccountId, childObjectNames);
+    }
+
+    private void performMerge() {
+        Account updatedMasterAccount = [SELECT Id FROM Account WHERE Id = :masterAccountId LIMIT 1];
+        Account updatedMergedAccount = [SELECT Id FROM Account WHERE Id = :mergedAccountId LIMIT 1];
+        Database.merge(updatedMasterAccount, updatedMergedAccount, true);
+    }
+    
 
     public void moveChildRecords(Id masterAccountId, Id mergedAccountId, List<String> childObjectNames) {
         // Iterate over each child object name in the list
