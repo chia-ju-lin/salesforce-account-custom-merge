@@ -1,23 +1,36 @@
-# Purpose of the Project: 
 
-The functionality is similar to the standard salesfoce merge function.
-This project provids the following functionality.
-- UI to allow two manual input for the account IDs
-- Display all fieds which have differnt values between the two accouts for the selection
-- After clicking the merge
-    - all childs will move to the master account 
-    - the selected values will be update to the maser account
-    - the merged account will be removed
-    - if any DML exception happend, the records will rollback
-- Please note that all Date, DateTime and not editable fields are not displaied
-- Please modify all *TODOs before using this function
+## Custom Merge Function - README
+The custom merge function is designed to provide a similar functionality to the standard Salesforce merge function. It allows for merging two account records while preserving selected values and handling child records appropriately. Before using this function, please make sure to modify all the *TODOs according to your specific requirements.
 
-## VF pages
+## Functionality Description
+The custom merge function offers the following functionality:
+
+1. User Interface (UI):
+ - The UI provides two manual input fields for entering the account IDs to be merged.
+2. Displaying Different Field Values:
+ - The function displays all fields that have different values between the two accounts for user selection.
+ - Fields such as Date, DateTime, and non-editable fields are excluded from the selection.
+3. Merging Process:
+ - After clicking the merge button, the following actions are performed:
+ - All child records associated with the merging accounts are moved to the master account.
+ - The selected field values are *updated in the master account.
+ - The merged account is removed from the system.
+ - In case of any DML (Data Manipulation Language) exceptions, the records are rolled back to their original state.
+4. Field Update Considerations:
+ - It's important to note that the *update operation might fail for certain fields defined with unique constraints and additional special rules. Additional implementation might be needed in such use case.
+
+## VF Pages
 
 - force-app/main/default/pages/mergeEntry.page
 - force-app/main/default/pages/merge.page
-- how to link the VF to a detail page?
-    - go to Account Object Manger/New button or Link, add "masterAccountId={!Account.Id}" as url parameter
+
+### To link the VF pages to a detail page, follow these steps:
+
+1. Go to the Account Object Manager.
+2. Navigate to the "Buttons, Links, and Actions" section.
+3. Either create a new button or edit an existing one.
+4. Add the following as a URL parameter: masterAccountId={!Account.Id}.
+
     ![Alt text](image-3.png)
 
 
@@ -28,9 +41,8 @@ This project provids the following functionality.
 
 ### Child Object Customization
 
-Modify the code under force-app/main/default/classes/AccountMergeController.cls
+To specify which child objects you want to move, modify the code inside mergeAccounts() in force-app/main/default/classes/AccountMergeController.cls.
 
-- specify which child object you want to move, the code is inside mergeAccounts()
     ```java
     // 3. move childs from merged account into master account            
             List<String> childObjectNames = new List<String>();
@@ -38,7 +50,8 @@ Modify the code under force-app/main/default/classes/AccountMergeController.cls
             childObjectNames.add('Opportunity');
     ```
 
-- specify the exernal ID 
+To specify the external ID, make the following changes:
+
     ```java
     public void moveChildRecords(Id masterAccountId, Id mergedAccountId, List<String> childObjectNames) {
         // Iterate over each child object name in the list
@@ -64,9 +77,8 @@ Modify the code under force-app/main/default/classes/AccountMergeController.cls
 
 ### Disable Merge Conditon Customization
 
-Modify the code under force-app/main/default/classes/AccountMergeController.cls inside getDisableMergeButton()
+To customize the code inside getDisableMergeButton() in force-app/main/default/classes/AccountMergeController.cls for disabling the merge button, set the external field.
 
-- set exterinal field 
     ```java
     public Boolean getDisableMergeButton() {         
         // if ERP(or EBP) ID exist in both master and merged         
@@ -83,5 +95,5 @@ Modify the code under force-app/main/default/classes/AccountMergeController.cls 
         return false;
     }
     ```
-
+Please update the code according to your specific external ID field requirements.
 
