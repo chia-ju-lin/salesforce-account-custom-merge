@@ -11,13 +11,16 @@ public class AccountMergeController {
     public String mergedAccountId { get; private set; }
 
     public AccountMergeController() {
+        // Get IDs from URL parameter
         masterAccountId = ApexPages.currentPage().getParameters().get('masterId');
         mergedAccountId = ApexPages.currentPage().getParameters().get('mergedId');
 
+        // Retrieve all fieds for the Account Object
         Map<String, Schema.SObjectField> accountFields = Account.SObjectType.getDescribe().fields.getMap();
         String metadataFields = '';
         for (Schema.SObjectField field : accountFields.values()) {
             Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
+            // Exclude date, datetime and non editable fields
             if (fieldDescribe.isUpdateable() && fieldDescribe.getType() != Schema.DisplayType.DATETIME && fieldDescribe.getType() != Schema.DisplayType.DATE) {
                 metadataFields += fieldDescribe.getName() + ',';
             }
@@ -63,7 +66,8 @@ public class AccountMergeController {
     public void mergeAccounts() {
         
         isMerged = true;
-        // Savepoint before performing any operations
+
+        // Savepoint before performing any DML operations
         Savepoint sp = Database.setSavepoint();
         
         try {            
@@ -105,7 +109,8 @@ public class AccountMergeController {
                     selectedValue = Boolean.valueOf((String) selectedValue);
                 } 
                 
-                // Check if the field is unique and update the merged account's field 
+                // Check if the field is unique and update the merged account's field
+                // TODO: might need additional customization if the field is specified with special rules 
                 if (fieldDescribe.isUnique() && (fieldType == Schema.DisplayType.INTEGER || fieldType == Schema.DisplayType.DOUBLE)) {
                     mergedAccount.put(field, 0);
                 }else if (fieldDescribe.isUnique()){

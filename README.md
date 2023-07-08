@@ -1,13 +1,13 @@
 
 ## Custom Merge Function - README
-The custom merge function is designed to provide a similar functionality to the standard Salesforce merge function. It allows for merging two account records while preserving selected values and handling child records appropriately. Before using this function, please make sure to modify all the *TODOs according to your specific requirements.
+The custom merge function is designed to provide a similar functionality to the standard Salesforce merge function. It allows for merging two account records while preserving selected values and handling child records appropriately. Before using this function, please make sure to modify all the *TODOs(which are specified in the code) according to your specific requirements.
 
 ## Functionality Description
 The custom merge function offers the following functionality:
 
-1. User Interface (UI):
- - The UI provides two manual input fields for entering the account IDs to be merged.
-2. Displaying Different Field Values:
+1. Entry User Interface:
+ - The Entry UI provides two manual input fields for entering the account IDs to be merged.
+2. Main UI Displays Different Field Values:
  - The function displays all fields that have different values between the two accounts for user selection.
  - Fields such as Date, DateTime, and non-editable fields are excluded from the selection.
 3. Merging Process:
@@ -28,8 +28,7 @@ The custom merge function offers the following functionality:
 
 1. Go to the Account Object Manager.
 2. Navigate to the "Buttons, Links, and Actions" section.
-3. Either create a new button or edit an existing one.
-4. Add the following as a URL parameter: masterAccountId={!Account.Id}.
+3. Add the following as a URL parameter: masterAccountId={!Account.Id}.
 
     ![Alt text](image-3.png)
 
