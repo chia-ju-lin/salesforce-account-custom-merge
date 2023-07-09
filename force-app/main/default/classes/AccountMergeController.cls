@@ -9,8 +9,11 @@ public class AccountMergeController {
     public Boolean isMerged { get; private set; }
     public String masterAccountId { get; private set; }
     public String mergedAccountId { get; private set; }
+    public Map<String, String> fieldLabels { get; private set; }
 
     public AccountMergeController() {
+
+        
         // Get IDs from URL parameter
         masterAccountId = ApexPages.currentPage().getParameters().get('masterId');
         mergedAccountId = ApexPages.currentPage().getParameters().get('mergedId');
@@ -38,15 +41,20 @@ public class AccountMergeController {
         // Initialize the selected values map
         selectedFieldValues = new Map<String, Object>();
 
-        // Populate the selected values for each field
+        // Populate fieldlabels and the default selected values for each field
+        fieldLabels = new Map<String, String>();
         differentFields = getDifferentFields();
         for (String field : differentFields) {
+            Schema.DescribeFieldResult fieldDescribe = Account.SObjectType.getDescribe().fields.getMap().get(field).getDescribe();
+            fieldLabels.put(field, fieldDescribe.getLabel());
+
             if (masterAccount.get(field) != null) {
                 selectedFieldValues.put(field, masterAccount.get(field));
             } else if (mergedAccount.get(field) != null) {
                 selectedFieldValues.put(field, mergedAccount.get(field));
             }
-        }
+        }       
+        
     }
 
     private List<String> getDifferentFields() {
@@ -83,7 +91,7 @@ public class AccountMergeController {
     
             // Perform merge
             performMerge();
-            mergeMessage = 'Merge successful!';
+            mergeMessage = 'Success!';
         } catch (Exception ex) {
 
             // Handle exception and rollback if necessary            
@@ -93,21 +101,24 @@ public class AccountMergeController {
     }
 
     private void updateUniqueFieldsInMergedAccountAndPrepareMasterAccount() {
-        // Retrieve the selected field values
+        // Retrieve the user selected field values
         for (String field : differentFields) {
-            Object selectedValue = selectedFieldValues.get(field);
+           // Object selectedValue = selectedFieldValues.get(field);
+           Object selectedValue = ApexPages.currentPage().getParameters().get(field);
     
-            if (selectedValue instanceof String) {
+         if (selectedValue instanceof String) {            
+        
                 Schema.DescribeFieldResult fieldDescribe = Account.SObjectType.getDescribe().fields.getMap().get(field).getDescribe();
                 Schema.DisplayType fieldType = fieldDescribe.getType();
     
+                String stringValue = (String) selectedValue;
                 if (fieldType == Schema.DisplayType.INTEGER) {
-                    selectedValue = Integer.valueOf((String) selectedValue);                    
-                } else if (fieldType == Schema.DisplayType.DOUBLE) {
-                    selectedValue = Double.valueOf((String) selectedValue);
+                    selectedValue = Integer.valueOf(stringValue);
+                } else if (fieldType == Schema.DisplayType.DOUBLE || fieldType == Schema.DisplayType.CURRENCY || fieldType == Schema.DisplayType.PERCENT) {
+                    selectedValue = Decimal.valueOf(stringValue);
                 } else if (fieldType == Schema.DisplayType.BOOLEAN) {
-                    selectedValue = Boolean.valueOf((String) selectedValue);
-                } 
+                    selectedValue = Boolean.valueOf(stringValue);
+                }
                 
                 // Check if the field is unique and update the merged account's field
                 // TODO: might need additional customization if the field is specified with special rules 

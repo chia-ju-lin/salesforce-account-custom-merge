@@ -1,28 +1,75 @@
 <apex:page controller="AccountMergeController">
+    <apex:slds />
+
     <apex:form rendered="{!NOT isMerged}">
-        <table>
-            <tr>
-                <th>Field</th>
-                <th>Master Account</th>
-                <th>Merged Account</th>
-            </tr>
-            <apex:repeat value="{!differentFields}" var="field">
+        <table class="slds-table slds-table_bordered slds-table_fixed-layout">
+            <thead>
                 <tr>
-                    <td>{!field}</td>
-                    <td>
-                       <apex:selectRadio value="{!selectedFieldValues[field]}" >
-                            <apex:selectOption itemValue="{!masterAccount[field]}" itemLabel="{!masterAccount[field]}" />
-                            <apex:selectOption itemValue="{!mergedAccount[field]}" itemLabel="{!mergedAccount[field]}" />
-                        </apex:selectRadio>
-                    </td>
+                    <th class="slds-text-heading_label">Field</th>
+                    <th class="slds-text-heading_label">Master field values</th>
+                    <th class="slds-text-heading_label">Merged field values</th>
+                   
                 </tr>
-            </apex:repeat>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!differentFields}" var="field">
+                    <tr>                        
+                        <td>{!fieldLabels[field]}</td>
+                        <td class="slds-text-align_left">
+                            <div class="slds-grid slds-wrap slds-grid--align-left">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <label class="slds-radio">
+                                        <apex:variable var="isMasterChecked" value="{!selectedFieldValues[field] == masterAccount[field]}" />
+                                        <input type="radio" name="{!field}" value="{!masterAccount[field]}" />
+                                        <apex:outputPanel layout="none" rendered="{!isMasterChecked}">
+                                            <script>
+                                                document.querySelector('[name="{!field}"]').checked = true;
+                                            </script>
+                                        </apex:outputPanel>
+                                        <span class="slds-radio--faux"></span>
+                                        <span class="slds-form-element__label">{!masterAccount[field]}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="slds-text-align_left">
+                            <div class="slds-grid slds-wrap slds-grid--align-left">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <label class="slds-radio">
+                                        <apex:variable var="isMergedChecked" value="{!selectedFieldValues[field] == mergedAccount[field]}" />
+                                      
+                                        <input type="radio" name="{!field}" value="{!mergedAccount[field]}" />
+                                        <apex:outputPanel layout="none" rendered="{!isMergedChecked}">
+                                            <script>
+                                                 document.querySelector('[name="{!field}"][value="{!mergedAccount[field]}"]').checked = true;
+                                            </script>
+                                        </apex:outputPanel>
+                                        <span class="slds-radio--faux"></span>
+                                        <span class="slds-form-element__label">{!mergedAccount[field]}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </tbody>
+
+           
+            
+            
+            
         </table>
-        <apex:commandButton value="Merge" action="{!mergeAccounts}" disabled="{!disableMergeButton}" />
+        <apex:commandButton value="Merge" action="{!mergeAccounts}" disabled="{!disableMergeButton}" styleClass="slds-button slds-button_brand" />
     </apex:form>
-   <apex:outputPanel rendered="{!isMerged}">
-        <div class="success-message">
-            {!mergeMessage}
-        </div>
+
+    <apex:outputPanel rendered="{!isMerged}">
+    <div class="slds-notify {!IF(LEN(mergeMessage)> 10 , 'slds-notify_alert slds-theme_error', 'slds-notify_alert slds-theme_success')} slds-m-top_medium" role="alert">
+        <span class="slds-assistive-text">{!IF(LEN(mergeMessage) > 10 , 'Error', 'Success')}</span>
+        {!mergeMessage}
+    </div>
     </apex:outputPanel>
+
+    
+
+
 </apex:page>

@@ -9,21 +9,35 @@ public class AccountMergeEntryController {
     }
 
     public PageReference redirectToMergePage() {
+        // Check if the master and merged Account IDs are identical
+        if (masterAccountId != null && mergedAccountId != null && masterAccountId.length() >= 15 && mergedAccountId.length() >= 15) {
+            String masterIdFirst15 = masterAccountId.substring(0, 15);
+            String mergedIdFirst15 = mergedAccountId.substring(0, 15);
+            
+            if (masterIdFirst15.equals(mergedIdFirst15)) {
+                errorMessage = 'Please enter different Account IDs.';
+                return null;
+            }
+        }
+        
         // Check if the entered Account IDs exist
         if (!accountExists(masterAccountId) || !accountExists(mergedAccountId)) {
             errorMessage = 'One or both of the entered Account IDs do not exist.';
-        } else if(masterAccountId == mergedAccountId) {
-            errorMessage = 'Please enter different Account IDs.';
-        } else {
+            return null;
+        }
+        try {
             // Redirect to your existing VF page with the entered values as URL parameters
             String redirectUrl = '/apex/merge?masterId=' + masterAccountId + '&mergedId=' + mergedAccountId;
             PageReference pageRef = new PageReference(redirectUrl);
             pageRef.setRedirect(true);
             return pageRef;
+        } catch (Exception e) {
+            errorMessage = 'Unexpected exception: '+ e;
+            return null;
         }
-        return null;
     }
-
+    
+    @testVisible
     private Boolean accountExists(String accountId) {   
         // Check if the Account ID is valid
         if (accountId == null || (accountId.length() != 15 && accountId.length() != 18)) {
