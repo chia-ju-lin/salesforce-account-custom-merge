@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This Custom Metada Type is used to store some configuration for the custom merge functions.</description>
+    <label>Custom Merge Setting</label>
+    <pluralLabel>Custom Merge Settings</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

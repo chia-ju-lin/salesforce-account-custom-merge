@@ -1,5 +1,5 @@
 public class DuplicateAccountRetriever {
-    public List<Account> getDuplicateAccounts(Id currentAccountId) {
+    public List<Account> getDuplicateAccounts(Id currentAccountId, List<String> fields) {
         // Retrieve the DuplicateRecordSetIds for the current account ID
         Set<Id> duplicateRecordSetIds = new Set<Id>();
         for (DuplicateRecordItem item : [
@@ -10,18 +10,24 @@ public class DuplicateAccountRetriever {
             duplicateRecordSetIds.add(item.DuplicateRecordSetId);
         }
 
+        // Construct the dynamic query string based on the selected fields
+        String queryFields = 'Id, ';
+        for (String field : fields) {
+            queryFields += field + ', ';
+        }
+        queryFields = queryFields.removeEnd(', ');
+
         // Retrieve the duplicate account records related to the DuplicateRecordSetIds
-        //TODO: query fields configiable to Account Owner Alias
-        List<Account> duplicateAccounts = [
-            SELECT Id, Name, Rating
-            FROM Account
-            WHERE Id IN (
-                SELECT RecordId
-                FROM DuplicateRecordItem
-                WHERE DuplicateRecordSetId IN :duplicateRecordSetIds
-            )
-            AND Id != :currentAccountId
-        ];
+        List<Account> duplicateAccounts = Database.query(''
+            + 'SELECT ' + queryFields + ' '
+            + 'FROM Account '
+            + 'WHERE Id IN ('
+                + 'SELECT RecordId '
+                + 'FROM DuplicateRecordItem '
+                + 'WHERE DuplicateRecordSetId IN :duplicateRecordSetIds'
+            + ') '
+            + 'AND Id != :currentAccountId'
+        );
 
         return duplicateAccounts;
     }

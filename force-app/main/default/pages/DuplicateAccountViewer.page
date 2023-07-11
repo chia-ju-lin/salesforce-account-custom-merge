@@ -7,8 +7,9 @@
                 <thead>
                     <tr class="slds-text-title_caps">
                         <th scope="col"></th>
-                        <th scope="col">Account Name</th>
-                        <th scope="col">Rating</th>
+                        <apex:repeat value="{!displayFieldLabels}" var="fieldLabel">
+                            <th scope="col">{!fieldLabel}</th>
+                        </apex:repeat>
                     </tr>
                 </thead>
                 <tbody>
@@ -18,7 +19,7 @@
                                 <div class="slds-form-element">
                                     <div class="slds-form-element__control">
                                         <span class="slds-radio">
-                                            <input type="radio" name="selectedAccountId" value="{!account.Id}" id="{!account.Id}" onclick="updateSelectedAccountId(this.value)" />
+                                            <input type="radio" name="selectedAccountId" value="{!account.Id}" id="{!account.Id}" onclick="updateSelectedAccountId(this.value)"  />
                                             <label class="slds-radio__label" for="{!account.Id}">
                                                 <span class="slds-radio--faux"></span>
                                                 <span class="slds-form-element__label"></span>
@@ -27,8 +28,9 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{!account.Name}</td>
-                            <td>{!account.Rating}</td>
+                            <apex:repeat value="{!displayFieldAPINames}" var="fieldAPIName">
+                                <td>{!account[fieldAPIName]}</td>
+                            </apex:repeat>
                         </tr>
                     </apex:repeat>
                 </tbody>
@@ -40,6 +42,14 @@
     </apex:form>
     
     <script>
+        // JavaScript code to preselect the first radio button
+        window.addEventListener('DOMContentLoaded', function() {
+        var radioButtons = document.querySelectorAll('input[type="radio"]');
+            if (radioButtons.length > 0) {
+                radioButtons[0].checked = true;
+            }
+        });
+
         function updateSelectedAccountId(accountId) {
             var hiddenInput = document.getElementById('selectedAccountIdHidden');
             hiddenInput.value = accountId;
