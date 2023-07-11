@@ -1,25 +1,41 @@
 <apex:page controller="DuplicateAccountController" action="{!loadAccounts}">
+    <apex:slds />
+
     <apex:form>
         <apex:pageBlock>
-            <table>
-                <tr>
-                    <th></th>
-                    <th>Account Name</th>
-                    <th>Rating</th>
-                </tr>
-                <apex:repeat value="{!duplicateAccounts}" var="account">
-                    <tr>
-                        <td>
-                            <input type="radio" name="selectedAccountId" value="{!account.Id}" onclick="updateSelectedAccountId(this.value)" />
-                        </td>
-                        <td>{!account.Name}</td>
-                        <td>{!account.Rating}</td>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col"></th>
+                        <th scope="col">Account Name</th>
+                        <th scope="col">Rating</th>
                     </tr>
-                </apex:repeat>
+                </thead>
+                <tbody>
+                    <apex:repeat value="{!duplicateAccounts}" var="account">
+                        <tr>
+                            <td>
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <span class="slds-radio">
+                                            <input type="radio" name="selectedAccountId" value="{!account.Id}" id="{!account.Id}" onclick="updateSelectedAccountId(this.value)" />
+                                            <label class="slds-radio__label" for="{!account.Id}">
+                                                <span class="slds-radio--faux"></span>
+                                                <span class="slds-form-element__label"></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{!account.Name}</td>
+                            <td>{!account.Rating}</td>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
             </table>
         </apex:pageBlock>
         
-        <apex:commandButton value="Merge" action="{!mergeSelectedAccount}"  styleClass="slds-button slds-button_brand" />
+        <apex:commandButton value="Merge" action="{!mergeSelectedAccount}" styleClass="slds-button slds-button_brand" />
         <input type="hidden" id="selectedAccountIdHidden" name="selectedAccountIdHidden" value="{!selectedAccountId}" />
     </apex:form>
     
