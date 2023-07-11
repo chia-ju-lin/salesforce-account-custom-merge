@@ -28,10 +28,14 @@ public class DuplicateAccountController {
     }
 
     public PageReference mergeSelectedAccount() {
+        // Retrieve the selected Account ID from the hidden input field
+        selectedAccountId = ApexPages.currentPage().getParameters().get('selectedAccountIdHidden');
+        
         // Perform the merge operation with the selected account
         String redirectUrl = '/apex/merge?masterId=' + currentAccountId + '&mergedId=' + selectedAccountId;
         PageReference pageRef = new PageReference(redirectUrl);
         pageRef.setRedirect(true);
         return pageRef;
     }
+    
 }

@@ -1,11 +1,32 @@
 <apex:page controller="DuplicateAccountController" action="{!loadAccounts}">
     <apex:form>
         <apex:pageBlock>
-            <apex:selectRadio value="{!selectedAccountId}" layout="pageDirection">
-                <apex:selectOptions value="{!accountOptions}" />
-            </apex:selectRadio>
+            <table>
+                <tr>
+                    <th></th>
+                    <th>Account Name</th>
+                    <th>Rating</th>
+                </tr>
+                <apex:repeat value="{!duplicateAccounts}" var="account">
+                    <tr>
+                        <td>
+                            <input type="radio" name="selectedAccountId" value="{!account.Id}" onclick="updateSelectedAccountId(this.value)" />
+                        </td>
+                        <td>{!account.Name}</td>
+                        <td>{!account.Rating}</td>
+                    </tr>
+                </apex:repeat>
+            </table>
         </apex:pageBlock>
-
-        <apex:commandButton value="Merge" action="{!mergeSelectedAccount}" styleClass="slds-button slds-button_brand" />
+        
+        <apex:commandButton value="Merge" action="{!mergeSelectedAccount}"  styleClass="slds-button slds-button_brand" />
+        <input type="hidden" id="selectedAccountIdHidden" name="selectedAccountIdHidden" value="{!selectedAccountId}" />
     </apex:form>
+    
+    <script>
+        function updateSelectedAccountId(accountId) {
+            var hiddenInput = document.getElementById('selectedAccountIdHidden');
+            hiddenInput.value = accountId;
+        }
+    </script>
 </apex:page>
