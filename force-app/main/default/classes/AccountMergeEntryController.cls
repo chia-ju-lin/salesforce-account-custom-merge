@@ -44,14 +44,13 @@ public class AccountMergeEntryController {
             return false;
         }
 
-
         try {
             // Check if the Account ID exists by performing a SOQL query
             String soqlQuery = 'SELECT Id FROM Account WHERE Id = \'' + accountId + '\' LIMIT 1';
             List<Account> accounts = Database.query(soqlQuery);
             return !accounts.isEmpty();
         } catch (Exception e) {
-            return true;
+            return false;
         }
     }
     

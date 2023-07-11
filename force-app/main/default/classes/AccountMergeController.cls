@@ -7,13 +7,11 @@ public class AccountMergeController {
     public List<String> differentFields { get; private set; }
     public String mergeMessage { get; private set; }
     public Boolean isMerged { get; private set; }
-    public String masterAccountId { get; private set; }
-    public String mergedAccountId { get; private set; }
+    public String masterAccountId { get; set; }
+    public String mergedAccountId { get; set; }
     public Map<String, String> fieldLabels { get; private set; }
 
-    public AccountMergeController() {
-
-        
+    public AccountMergeController() {        
         // Get IDs from URL parameter
         masterAccountId = ApexPages.currentPage().getParameters().get('masterId');
         mergedAccountId = ApexPages.currentPage().getParameters().get('mergedId');
