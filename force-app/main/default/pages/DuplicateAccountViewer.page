@@ -1,35 +1,11 @@
 <apex:page controller="DuplicateAccountController" action="{!loadAccounts}">
     <apex:form>
         <apex:pageBlock>
-            <table>
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Rating</th>
-                </tr>
-                <apex:repeat value="{!duplicateAccounts}" var="account">
-                    <tr>
-                        <td>
-                            <input type="radio" name="selectedAccountId" value="{!account.Id}" onclick="handleRadioClick(this)"/>
-                        </td>
-                        <td>{!account.Name}</td>
-                        <td>{!account.Rating}</td>
-                    </tr>
-                </apex:repeat>
-            </table>
+            <apex:selectRadio value="{!selectedAccountId}" layout="pageDirection">
+                <apex:selectOptions value="{!accountOptions}" />
+            </apex:selectRadio>
         </apex:pageBlock>
-        
-        <apex:outputPanel id="mergeButton">
-            <apex:commandButton value="Merge" action="{!mergeSelectedAccount}"  styleClass="slds-button slds-button_brand"/>
-        </apex:outputPanel>
-        
-        <apex:inputHidden id="selectedAccountIdInput" value="{!selectedAccountId}" />
+
+        <apex:commandButton value="Merge" action="{!mergeSelectedAccount}" styleClass="slds-button slds-button_brand" />
     </apex:form>
-    
-    <script>
-        function handleRadioClick(radio) {
-            var selectedAccountIdInput = document.getElementById('{!$Component.selectedAccountIdInput}');
-            selectedAccountIdInput.value = radio.value;
-        }
-    </script>
 </apex:page>
