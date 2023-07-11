@@ -1,8 +1,8 @@
-<apex:page controller="DuplicateAccountController" action="{!loadAccounts}">
+<apex:page controller="AccountMergeDuplicateController" >
     <apex:slds />
 
-    <apex:form>
-        <apex:pageBlock>
+    <apex:form >
+        <apex:pageBlock >
             <table class="slds-table slds-table_cell-buffer slds-table_bordered">
                 <thead>
                     <tr class="slds-text-title_caps">

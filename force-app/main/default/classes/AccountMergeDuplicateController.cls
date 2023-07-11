@@ -1,4 +1,4 @@
-public class DuplicateAccountController {
+public class AccountMergeDuplicateController {
     public List<Account> duplicateAccounts { get; set; }
     public String selectedAccountId { get; set; }
     public List<SelectOption> accountOptions { get; set; }
@@ -6,7 +6,10 @@ public class DuplicateAccountController {
     public List<String> displayFieldAPINames { get; set; }
     public List<String> displayFieldLabels { get; set; }
 
-    public DuplicateAccountController() {
+    public AccountMergeDuplicateController() {
+
+        // Retrieve the masterAccountId from the URL parameter
+        currentAccountId = ApexPages.currentPage().getParameters().get('masterAccountId');
         accountOptions = new List<SelectOption>();
         displayFieldAPINames = new List<String>();
         displayFieldLabels = new List<String>();
@@ -14,8 +17,7 @@ public class DuplicateAccountController {
     }
 
     public void loadAccounts() {
-        // Assuming you have the current account ID stored in a variable called 'currentAccountId'
-        currentAccountId = '0015I00000iqj4TQAQ';      
+         
 
         // Get the selected fields from Custom Metadata Type dynamically
         Custom_Merge_Settings__mdt setting = Custom_Merge_Settings__mdt.getInstance('lulu_Sandbox');
@@ -30,8 +32,8 @@ public class DuplicateAccountController {
             displayFieldLabels.add(accountDescribe.fields.getMap().get(fieldAPIName).getDescribe().getLabel());
         }
 
-        DuplicateAccountRetriever accountRetriever = new DuplicateAccountRetriever();
-        duplicateAccounts = accountRetriever.getDuplicateAccounts(currentAccountId, displayFieldAPINames);
+        AccountMergeHelper accountMergeHelper = new AccountMergeHelper();
+        duplicateAccounts = accountMergeHelper.getDuplicateAccounts(currentAccountId, displayFieldAPINames);
 
          // Set the first account ID as the default selectedAccountId
          if (duplicateAccounts.size() > 0) {

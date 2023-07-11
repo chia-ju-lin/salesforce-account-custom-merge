@@ -1,4 +1,5 @@
-public class DuplicateAccountRetriever {
+public class AccountMergeHelper {
+    
     public List<Account> getDuplicateAccounts(Id currentAccountId, List<String> fields) {
         // Retrieve the DuplicateRecordSetIds for the current account ID
         Set<Id> duplicateRecordSetIds = new Set<Id>();

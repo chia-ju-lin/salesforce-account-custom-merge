@@ -1,7 +1,7 @@
 <apex:page controller="AccountMergeEntryController">
     <apex:slds />
 
-    <apex:form>
+    <apex:form >
         <div class="slds-grid slds-wrap slds-grid--align-center">
             <div class="slds-col slds-size_1-of-2">
                 <div class="slds-form-element">

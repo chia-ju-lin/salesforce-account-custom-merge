@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
-      
-
-     <types>
-        <members>Custom_Merge_Settings__mdt</members>
-        <name>CustomObject</name>
-    </types>
-    
-    <version>57.0</version>
+	<types>
+		<members>AccountMergeController</members>
+		<members>AccountMergeControllerTest</members>
+		<members>AccountMergeEntryController</members>
+		<members>AccountMergeEntryControllerTest</members>
+        <members>AccountMergeDuplicateController</members>        
+		<members>AccountMergeHelper</members>
+		<name>ApexClass</name>
+	</types>
+    <types>
+		<members>mergeDuplicateSelection</members>
+		<members>merge</members>
+		<members>mergeIDSelection</members>
+		<name>ApexPage</name>
+	</types>
+	<types>
+		<members>Custom_Merge_Settings__mdt</members>
+		<name>CustomObject</name>
+	</types>
+	<version>55.0</version>
 </Package>
