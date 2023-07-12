@@ -10,6 +10,8 @@ public class AccountMergeController {
     public String masterAccountId { get; set; }
     public String mergedAccountId { get; set; }
     public Map<String, String> fieldLabels { get; private set; }
+    public String disableMergeMessage { get; private set; }
+    public Boolean disableMerge { get; private set; }
 
     public AccountMergeController() {        
         // Get IDs from URL parameter
@@ -51,7 +53,10 @@ public class AccountMergeController {
             } else if (mergedAccount.get(field) != null) {
                 selectedFieldValues.put(field, mergedAccount.get(field));
             }
-        }       
+        }
+        
+        // Get disable Button
+        disableMerge = checkDisableMergeCondition();
         
     }
 
@@ -170,7 +175,7 @@ public class AccountMergeController {
         }
     }   
 
-    public Boolean getDisableMergeButton() {         
+    public Boolean checkDisableMergeCondition() {         
         // if ERP(or EBP) ID exist in both master and merged         
         // if ERP(or EBP) in both master and merged are both empty
         // TODO: Set actual extrnalID custom fields
@@ -180,6 +185,7 @@ public class AccountMergeController {
 
         // Check if both external IDs are empty or both have values
         if ((isMasterERPIdEmpty && isMergedERPIdEmpty) || (!isMasterERPIdEmpty && !isMergedERPIdEmpty)) {
+            disableMergeMessage = 'Both external IDs are empty or both have values. Merging is not allowed.';
             return true; // Disable the Merge button
         }
         return false;

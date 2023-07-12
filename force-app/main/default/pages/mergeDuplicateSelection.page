@@ -39,7 +39,14 @@
         
         <apex:commandButton value="Merge" action="{!mergeSelectedAccount}" styleClass="slds-button slds-button_brand" />
         <input type="hidden" id="selectedAccountIdHidden" name="selectedAccountIdHidden" value="{!selectedAccountId}" />
-    </apex:form>
+        
+        <apex:outputPanel rendered="{!NOT(ISBLANK(errorMessage))}">
+            <div class="slds-text-color_error slds-m-top_medium">
+                {!errorMessage}
+            </div>
+        </apex:outputPanel>
+    
+    </apex:form>    
     
     <script>
         // JavaScript code to preselect the first radio button

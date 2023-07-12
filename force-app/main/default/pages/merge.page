@@ -52,15 +52,16 @@
                         </td>
                     </tr>
                 </apex:repeat>
-            </tbody>
-
-           
-            
-            
+            </tbody>     
             
         </table>
-        <apex:commandButton value="Merge" action="{!mergeAccounts}" disabled="{!disableMergeButton}" styleClass="slds-button slds-button_brand" />
-    </apex:form>
+        <apex:commandButton value="Merge" action="{!mergeAccounts}" disabled="{!disableMerge}" styleClass="slds-button slds-button_brand" />
+        <apex:outputPanel rendered="{!NOT(ISBLANK(disableMergeMessage))}">
+            <div class="slds-text-color_error slds-m-top_medium">
+                {!disableMergeMessage}
+            </div>
+        </apex:outputPanel>
+    </apex:form>    
 
     <apex:outputPanel rendered="{!isMerged}">
     <div class="slds-notify {!IF(LEN(mergeMessage)> 10 , 'slds-notify_alert slds-theme_error', 'slds-notify_alert slds-theme_success')} slds-m-top_medium" role="alert">
@@ -68,8 +69,4 @@
         {!mergeMessage}
     </div>
     </apex:outputPanel>
-
-    
-
-
 </apex:page>

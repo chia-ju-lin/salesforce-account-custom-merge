@@ -5,6 +5,7 @@ public class AccountMergeDuplicateController {
     public String currentAccountId { get; set; }
     public List<String> displayFieldAPINames { get; set; }
     public List<String> displayFieldLabels { get; set; }
+    public String errorMessage { get; set; }
 
     public AccountMergeDuplicateController() {
 
@@ -16,12 +17,11 @@ public class AccountMergeDuplicateController {
         loadAccounts();
     }
 
-    public void loadAccounts() {
-         
+    public void loadAccounts() {         
 
         // Get the selected fields from Custom Metadata Type dynamically
         Custom_Merge_Settings__mdt setting = Custom_Merge_Settings__mdt.getInstance('lulu_Sandbox');
-        //DuplicateViewSetting__mdt setting = Custom_Merge_Settings__mdt.getInstance('FieldAPINames');
+        
         displayFieldAPINames = setting.FieldAPINames__c.split(',');
 
         // Get the field labels dynamically from the schema
@@ -32,10 +32,9 @@ public class AccountMergeDuplicateController {
             displayFieldLabels.add(accountDescribe.fields.getMap().get(fieldAPIName).getDescribe().getLabel());
         }
 
-        AccountMergeHelper accountMergeHelper = new AccountMergeHelper();
-        duplicateAccounts = accountMergeHelper.getDuplicateAccounts(currentAccountId, displayFieldAPINames);
+        duplicateAccounts = AccountMergeHelper.getDuplicateAccounts(currentAccountId, displayFieldAPINames);
 
-         // Set the first account ID as the default selectedAccountId
+         // Set the first account ID as the default selectedAccountId         
          if (duplicateAccounts.size() > 0) {
             selectedAccountId = duplicateAccounts[0].Id;
         }
@@ -45,10 +44,21 @@ public class AccountMergeDuplicateController {
         // Retrieve the selected Account ID from the hidden input field
         selectedAccountId = ApexPages.currentPage().getParameters().get('selectedAccountIdHidden');
         
-        // Perform the merge operation with the selected account
-        String redirectUrl = '/apex/merge?masterId=' + currentAccountId + '&mergedId=' + selectedAccountId;
-        PageReference pageRef = new PageReference(redirectUrl);
-        pageRef.setRedirect(true);
-        return pageRef;
+        // Call the AccountMergeHelper method and retrieve the MergeResult
+        AccountMergeHelper.MergeResult mergeResult = AccountMergeHelper.redirectToMergePage(currentAccountId, selectedAccountId);
+        
+        if (mergeResult.errorMessage != null) {
+            // Retrieve the error message from mergeResult.errorMessage
+            errorMessage = mergeResult.errorMessage;
+            return null;
+        } else if (mergeResult.pageRef != null) {
+            // Handle the successful redirection
+            return mergeResult.pageRef;            
+        } else {
+            // Handle other scenarios or errors
+            errorMessage = 'Unexpected error occurred.';
+            return null;
+        }
+    
     }
 }
