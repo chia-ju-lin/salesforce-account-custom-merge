@@ -55,7 +55,8 @@
             </tbody>     
             
         </table>
-        <apex:commandButton value="Merge" action="{!mergeAccounts}" disabled="{!disableMerge}" styleClass="slds-button slds-button_brand" />
+       
+
         <apex:outputPanel rendered="{!NOT(ISBLANK(disableMergeMessage))}">
             <div class="slds-text-color_error slds-m-top_medium">
                 {!disableMergeMessage}
@@ -69,4 +70,55 @@
         {!mergeMessage}
     </div>
     </apex:outputPanel>
+    <style>
+        .merge-button-disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+    </style>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function checkExternalIdSelection() {
+            var selectedValue = this.value;
+            var disableMerge = '{!disableMerge}'; // Replace with the appropriate merge disable condition from the controller
+            
+            if (selectedValue !== '' && disableMerge !== 'true') {
+                jQuery('#mergeButtonWrapper').show();
+                jQuery('#disableErrorMessage').hide();
+            } else {
+                jQuery('#mergeButtonWrapper').hide();
+                jQuery('#disableErrorMessage').show();
+            }
+        }    
+        
+    
+        jQuery(document).ready(function() {
+            var externalIdRadios = jQuery('input[name="ExternalID__c"]');
+            externalIdRadios.on('click', checkExternalIdSelection);
+    
+            // Initialize the merge button state
+            if ('{!disableMerge}' === 'true') {
+                jQuery('#mergeButtonWrapper').hide();                
+            } else {
+                jQuery('#mergeButtonWrapper').show();
+            }
+        });
+    </script>
+    
+    <div id="mergeButtonWrapper">
+        <apex:outputText value="Merge" id="mergeButton" rendered="{!NOT(disableMerge)}" styleClass="slds-button slds-button_brand" />
+    </div>
+    <div id="disableErrorMessage" class="slds-text-color_error slds-m-top_medium" style="display:none;">
+        Error: Please select an external ID.
+    </div>
+    
+    
+
+    
+    
+    
+
+    
 </apex:page>

@@ -1,6 +1,26 @@
 @isTest
 public class AccountMergeControllerTest {
-  
+   /* 
+
+    @testSetup 
+    public static void setupTestData() {
+        // Create Account 1 with a rating of 'Hot'
+        Account account1 = new Account();
+        account1.Name = 'Account 1';
+        account1.Rating = 'Hot';
+        
+        // Create Account 2 with a rating of 'Cold'
+        Account account2 = new Account();
+        account2.Name = 'Account 2';
+        account2.Rating = 'Cold';
+        
+        // Insert the accounts into the database
+        List<Account> accountList = new List<Account>();
+        accountList.add(account1);
+        accountList.add(account2);
+        insert accountList;
+    }*/
+
     @isTest
     static void testMergeAccounts() {
         // Create master and merged accounts

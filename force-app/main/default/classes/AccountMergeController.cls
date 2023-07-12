@@ -5,6 +5,8 @@ public class AccountMergeController {
     public Map<String, Object> selectedFieldValues { get; set; }
     public List<String> fieldValues { get; private set; }
     public List<String> differentFields { get; private set; }
+    public List<String> childObjectNames { get; private set; }
+    public List<String> restrictedExternalFields { get; private set; }
     public String mergeMessage { get; private set; }
     public Boolean isMerged { get; private set; }
     public String masterAccountId { get; set; }
@@ -16,7 +18,7 @@ public class AccountMergeController {
     public AccountMergeController() {        
         // Get IDs from URL parameter
         masterAccountId = ApexPages.currentPage().getParameters().get('masterId');
-        mergedAccountId = ApexPages.currentPage().getParameters().get('mergedId');
+        mergedAccountId = ApexPages.currentPage().getParameters().get('mergedId');        
 
         // Retrieve all fieds for the Account Object
         Map<String, Schema.SObjectField> accountFields = Account.SObjectType.getDescribe().fields.getMap();
@@ -56,7 +58,7 @@ public class AccountMergeController {
         }
         
         // Get disable Button
-        disableMerge = checkDisableMergeCondition();
+        checkDisableMergeCondition();
         
     }
 
@@ -81,8 +83,7 @@ public class AccountMergeController {
         // Savepoint before performing any DML operations
         Savepoint sp = Database.setSavepoint();
         
-        try {            
-    
+        try {    
             // Update merged account for unique fields to prevent duplication error when updating master
             updateUniqueFieldsInMergedAccountAndPrepareMasterAccount();
     
@@ -90,13 +91,12 @@ public class AccountMergeController {
             update masterAccount;
     
             // Move child records from merged account into master account
-            moveChildRecordsToMasterAccount();
+            moveChildRecords(masterAccountId, mergedAccountId, childObjectNames);
     
             // Perform merge
             performMerge();
             mergeMessage = 'Success!';
         } catch (Exception ex) {
-
             // Handle exception and rollback if necessary            
             mergeMessage = 'Merge failed! ' + ex.getMessage();
             Database.rollback(sp);
@@ -139,15 +139,6 @@ public class AccountMergeController {
         update mergedAccount;
     }
     
-
-    private void moveChildRecordsToMasterAccount() {
-        List<String> childObjectNames = new List<String>();
-        // TODO: Set the child objects
-        childObjectNames.add('Opportunity');
-
-        moveChildRecords(masterAccountId, mergedAccountId, childObjectNames);
-    }
-
     private void performMerge() {
         Account updatedMasterAccount = [SELECT Id FROM Account WHERE Id = :masterAccountId LIMIT 1];
         Account updatedMergedAccount = [SELECT Id FROM Account WHERE Id = :mergedAccountId LIMIT 1];
@@ -173,21 +164,57 @@ public class AccountMergeController {
                 Database.update(childRecord);
             }
         }
-    }   
+    } 
+    
+    private Boolean isSetCustomMetadataType() {
+        // Get the selected fields from Custom Metadata Type Custom_Merge_Settings__mdt.ChildObjectNames__c
+        // TODO: Set the child objects in salesforce and use the instance 
+        Custom_Merge_Settings__mdt setting = Custom_Merge_Settings__mdt.getInstance('lulu_Sandbox');
 
-    public Boolean checkDisableMergeCondition() {         
-        // if ERP(or EBP) ID exist in both master and merged         
-        // if ERP(or EBP) in both master and merged are both empty
-        // TODO: Set actual extrnalID custom fields
-        
-        Boolean isMasterERPIdEmpty = String.isBlank(masterAccount.ExternalID__c);
-        Boolean isMergedERPIdEmpty = String.isBlank(mergedAccount.ExternalID__c);
-
-        // Check if both external IDs are empty or both have values
-        if ((isMasterERPIdEmpty && isMergedERPIdEmpty) || (!isMasterERPIdEmpty && !isMergedERPIdEmpty)) {
-            disableMergeMessage = 'Both external IDs are empty or both have values. Merging is not allowed.';
-            return true; // Disable the Merge button
+        if (null == setting){
+            disableMergeMessage = 'Please define the custom metada type: custom merge setting.';
+            disableMerge = true; // Disable the Merge button
+            return false;
+        } else if( null == setting.ChildObjectNames__c){
+            disableMergeMessage = 'Please define the child relateion via custom metada type.';
+            disableMerge = true; // Disable the Merge button
+            return false;
+        } else if(null == setting.RestrictedExternalFields__c){
+            disableMergeMessage = 'Please define the restricted external fields via custom metada type.';
+            disableMerge = true; // Disable the Merge button
+            return false;
         }
-        return false;
+        childObjectNames = new List<String>();
+        childObjectNames = setting.ChildObjectNames__c.split(',');
+
+        restrictedExternalFields = new List<String>();
+        restrictedExternalFields = setting.RestrictedExternalFields__c.split(',');
+        return true;
+        
+    }
+
+    public void restrictExternalFields(List<String> restrictedExternalFields) {
+        for (String field : restrictedExternalFields) {
+            Boolean isMasterFieldEmpty = String.isBlank((String) masterAccount.get(field));
+            Boolean isMergedFieldEmpty = String.isBlank((String) mergedAccount.get(field));
+    
+            // Check if both fields are empty or both have values
+            if ((isMasterFieldEmpty && isMergedFieldEmpty) || (!isMasterFieldEmpty && !isMergedFieldEmpty)) {
+                disableMergeMessage = 'Both ' + field + ' fields are empty or both have values. Merging is not allowed.';
+                disableMerge = true; // Disable the Merge button
+                break; // Exit the loop after the first field that meets the condition
+            }
+        }
+    }
+
+
+    public void checkDisableMergeCondition() {
+        // disable merge if custom meta data type is not defined
+        if (!isSetCustomMetadataType()){
+            return;
+        }
+        // disable merge if resticted fieds condition are met
+        restrictExternalFields(restrictedExternalFields);
+            
     }
 }

@@ -15,7 +15,17 @@ public class AccountMergeEntryControllerTest {
         
         Test.startTest();
         // Call the method under test
-        PageReference pageRef = controller.redirectToMergePage();
+        Pagereference ref = controller.redirectToMergePage();       
+        
+        // Assert the error message
+        System.assertEquals(null, controller.errorMessage);
+        // Assert that the page reference is null
+        System.assertEquals('/apex/merge?masterId=' + masterAccount.Id + '&mergedId=' + mergedAccount.Id, ref.getUrl());
+        
+        
+        // Call the method under test
+        AccountMergeHelper.MergeResult result = AccountMergeHelper.redirectToMergePage(controller.masterAccountId,controller.mergedAccountId);
+        PageReference pageRef = result.pageRef;
         Test.stopTest();
         
         // Assert the results
@@ -31,11 +41,13 @@ public class AccountMergeEntryControllerTest {
         
         Test.startTest();
         // Call the method under test
-        PageReference pageRef = controller.redirectToMergePage();
+        AccountMergeHelper.MergeResult result = AccountMergeHelper.redirectToMergePage(controller.masterAccountId,controller.mergedAccountId);
+        PageReference pageRef = result.pageRef;
+        String error = result.errorMessage;
         Test.stopTest();
         
         // Assert the error message
-        System.assertEquals('One or both of the entered Account IDs do not exist.', controller.errorMessage);
+        System.assertEquals('One or both of the entered Account IDs do not exist.', error);
         // Assert that the page reference is null
         System.assertEquals(null, pageRef);
     }
@@ -51,36 +63,18 @@ public class AccountMergeEntryControllerTest {
         
         Test.startTest();
         // Call the method under test
-        PageReference pageRef = controller.redirectToMergePage();
+        AccountMergeHelper.MergeResult result = AccountMergeHelper.redirectToMergePage(controller.masterAccountId,controller.mergedAccountId);
+        PageReference pageRef = result.pageRef;
+        String error = result.errorMessage;
         Test.stopTest();
         
         // Assert the error message
-        System.assertEquals('Please enter different Account IDs.', controller.errorMessage);
+        System.assertEquals('Please enter different Account IDs.', error);
         // Assert that the page reference is null
         System.assertEquals(null, pageRef);
     }
-    
-    /*
-    @isTest
-    static void testRedirectToMergePage_Exception() {
-        AccountMergeEntryController controller = new AccountMergeEntryController();
-        controller.masterAccountId = 'invalidId';
-        controller.mergedAccountId = 'validId';
+
         
-        Test.startTest();
-        // Call the method under test
-        PageReference pageRef = controller.redirectToMergePage();
-        Test.stopTest();
-        
-        // Assert the error message
-        //System.assert(controller.errorMessage.startsWith('Unexpected exception:'));
-        // Assert the error message is not empty
-        System.debug('Actual error message: ' + controller.errorMessage);
-        System.assertNotEquals('', controller.errorMessage, 'Error message is empty');
-        // Assert that the page reference is null
-        System.assertEquals(null, pageRef);
-    }*/    
-    
     @isTest
     static void testAccountExists() {
         Account account = new Account(Name = 'Test Account');
@@ -89,15 +83,30 @@ public class AccountMergeEntryControllerTest {
         AccountMergeEntryController controller = new AccountMergeEntryController();
         
         // Test valid account ID
-        Boolean exists = controller.accountExists(account.Id);
+        Boolean exists = AccountMergeHelper.accountExists(account.Id);
         System.assertEquals(true, exists);
         
         // Test invalid account ID
-        exists = controller.accountExists('invalidId');
+        exists = AccountMergeHelper.accountExists('invalidId');
         System.assertEquals(false, exists);
         
-        // Test null account ID
-        exists = controller.accountExists(null);
+        // Test not exist account ID
+        exists = AccountMergeHelper.accountExists('0015I00000iqj2qQAA');
         System.assertEquals(false, exists);
+
+        Test.startTest();
+        // Call the method under test
+        Pagereference ref = controller.redirectToMergePage();
+        AccountMergeHelper.MergeResult result = AccountMergeHelper.redirectToMergePage(controller.masterAccountId,controller.mergedAccountId);
+        PageReference pageRef = result.pageRef;
+        String error = result.errorMessage;
+        Test.stopTest();
+        
+        // Assert the error message
+        System.assertNotEquals(null, controller.errorMessage);
+        System.assertNotEquals(null, error);
+        // Assert that the page reference is null
+        System.assertEquals(null, ref);
+        System.assertEquals(null, pageRef);
     }
 }

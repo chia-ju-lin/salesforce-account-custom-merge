@@ -26,17 +26,14 @@ public class AccountMergeHelper {
             return result;
         }
         
-        try {
-            // Redirect to your existing VF page with the entered values as URL parameters
-            String redirectUrl = '/apex/merge?masterId=' + masterAccountId + '&mergedId=' + mergedAccountId;
-            PageReference pageRef = new PageReference(redirectUrl);
-            pageRef.setRedirect(true);
-            result.pageRef = pageRef;
-            return result;
-        } catch (Exception e) {
-            result.errorMessage = 'Unexpected exception: '+ e;
-            return result;
-        }
+        
+        // Redirect to your existing VF page with the entered values as URL parameters
+        String redirectUrl = '/apex/merge?masterId=' + masterAccountId + '&mergedId=' + mergedAccountId;
+        PageReference pageRef = new PageReference(redirectUrl);
+        pageRef.setRedirect(true);
+        result.pageRef = pageRef;
+        return result;
+        
     }
     
     @testVisible

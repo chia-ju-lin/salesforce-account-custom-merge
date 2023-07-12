@@ -21,7 +21,11 @@ public class AccountMergeDuplicateController {
 
         // Get the selected fields from Custom Metadata Type dynamically
         Custom_Merge_Settings__mdt setting = Custom_Merge_Settings__mdt.getInstance('lulu_Sandbox');
-        
+        if (null == setting || null == setting.FieldAPINames__c){
+            errorMessage = 'Please define which fields to display in the custom meta data!';
+            return;
+        }
+
         displayFieldAPINames = setting.FieldAPINames__c.split(',');
 
         // Get the field labels dynamically from the schema
