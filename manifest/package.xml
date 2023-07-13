@@ -5,7 +5,8 @@
 		<members>AccountMergeControllerTest</members>
 		<members>AccountMergeEntryController</members>
 		<members>AccountMergeEntryControllerTest</members>
-        <members>AccountMergeDuplicateController</members>        
+        <members>AccountMergeDuplicateController</members>
+		<members>AccountMergeDuplicateControllerTest</members>        
 		<members>AccountMergeHelper</members>
 		<name>ApexClass</name>
 	</types>
