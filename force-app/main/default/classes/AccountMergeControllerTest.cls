@@ -31,7 +31,7 @@ public class AccountMergeControllerTest {
         Map<String, String> urlParams = new Map<String, String>();
         urlParams.put('masterId', masterAccount.Id);
         urlParams.put('mergedId', mergedAccount.Id);
-        // Add the 'Name', 'Rating' fields to the URL parameters to simulate selectedFieldValues
+        // Add the 'Name', 'Rating' fields to the URL parameters for selectedFieldValues
         urlParams.put('Name', 'Merged Account');
         urlParams.put('Rating', 'Cold');
 

@@ -1,13 +1,14 @@
 
 ## Custom Merge Function - README
-The custom merge function is designed to provide a similar functionality to the standard Salesforce merge function. It allows for merging two account records while preserving selected values and handling child records appropriately. Before using this function, please make sure to modify all the *TODOs(which are specified in the code) according to your specific requirements.
+The custom merge function is designed to provide a similar functionality to the standard Salesforce merge function. It allows for merging two account records while preserving selected values and handling child records appropriately. Before using this function, please make sure to define the 'Custom Merge Setting' Custom Metadata Type and modify the *TODOs(which are specified in the code) according to your specific org requirements.
 
 ## Functionality Description
 The custom merge function offers the following functionality:
 
-1. Entry User Interface:
- - The Entry UI provides two manual input fields for entering the account IDs to be merged.
-2. Main UI Displays Different Field Values:
+1. Two different entry points:
+ - ID Selection UI
+ - View Duplication UI
+2. Different field values selection:
  - The function displays all fields that have different values between the two accounts for user selection.
  - Fields such as Date, DateTime, and non-editable fields are excluded from the selection.
 3. Merging Process:
@@ -21,7 +22,8 @@ The custom merge function offers the following functionality:
 
 ## VF Pages
 
-- force-app/main/default/pages/mergeEntry.page
+- force-app/main/default/pages/mergeDuplicateSelection.page
+- force-app/main/default/pages/mergeIDSelection.page
 - force-app/main/default/pages/merge.page
 
 ### To link the VF pages to a detail page, follow these steps:
@@ -29,25 +31,16 @@ The custom merge function offers the following functionality:
 1. Go to the Account Object Manager.
 2. Navigate to the "Buttons, Links, and Actions" section.
 3. Add the following as a URL parameter: masterAccountId={!Account.Id}.
+![Alt text](image-6.png)
+![Alt text](image-7.png)
 
-    ![Alt text](image-3.png)
+## Major Apex classes
 
-
-## Apex classes
-
+- force-app/main/default/classes/AccountMergeDuplicateController.cls
 - force-app/main/default/classes/AccountMergeEntryController.cls
 - force-app/main/default/classes/AccountMergeController.cls
 
-### Child Object Customization
-
-To specify which child objects you want to move, modify the code inside mergeAccounts() in force-app/main/default/classes/AccountMergeController.cls.
-
-    ```java
-    // 3. move childs from merged account into master account            
-            List<String> childObjectNames = new List<String>();
-            // TODO: Set the child objects
-            childObjectNames.add('Opportunity');
-    ```
+### Specify foreign key 
 
 To specify the external ID, make the following changes:
 
@@ -74,25 +67,64 @@ To specify the external ID, make the following changes:
     ```
 
 
-### Disable Merge Conditon Customization
+### Handle Unique fields
 
-To customize the code inside getDisableMergeButton() in force-app/main/default/classes/AccountMergeController.cls for disabling the merge button, set the external field.
+If some fields have unique constrain, need to handle it in this method:
 
     ```java
-    public Boolean getDisableMergeButton() {         
-        // if ERP(or EBP) ID exist in both master and merged         
-        // if ERP(or EBP) in both master and merged are both empty
-        // TODO: Set actual extrnalID custom fields
+    private void updateUniqueFieldsInMergedAccountAndPrepareMasterAccount() {
+        // Retrieve the user selected field values
+        for (String field : differentFields) {
+           // Object selectedValue = selectedFieldValues.get(field);
+           Object selectedValue = ApexPages.currentPage().getParameters().get(field);
+    
+         if (selectedValue instanceof String) {            
         
-        Boolean isMasterERPIdEmpty = String.isBlank(masterAccount.ExternalID__c);
-        Boolean isMergedERPIdEmpty = String.isBlank(mergedAccount.ExternalID__c);
-
-        // Check if both external IDs are empty or both have values
-        if ((isMasterERPIdEmpty && isMergedERPIdEmpty) || (!isMasterERPIdEmpty && !isMergedERPIdEmpty)) {
-            return true; // Disable the Merge button
+                Schema.DescribeFieldResult fieldDescribe = Account.SObjectType.getDescribe().fields.getMap().get(field).getDescribe();
+                Schema.DisplayType fieldType = fieldDescribe.getType();
+    
+                String stringValue = (String) selectedValue;
+                if (fieldType == Schema.DisplayType.INTEGER) {
+                    selectedValue = Integer.valueOf(stringValue);
+                } else if (fieldType == Schema.DisplayType.DOUBLE || fieldType == Schema.DisplayType.CURRENCY || fieldType == Schema.DisplayType.PERCENT) {
+                    selectedValue = Decimal.valueOf(stringValue);
+                } else if (fieldType == Schema.DisplayType.BOOLEAN) {
+                    selectedValue = Boolean.valueOf(stringValue);
+                }
+                
+                // Check if the field is unique and update the merged account's field
+                // TODO: might need additional customization if the field is specified with special rules 
+                if (fieldDescribe.isUnique() && (fieldType == Schema.DisplayType.INTEGER || fieldType == Schema.DisplayType.DOUBLE)) {
+                    mergedAccount.put(field, 0);
+                }else if (fieldDescribe.isUnique()){
+                    mergedAccount.put(field, 'tempValue');
+                }
+            }
+    
+            masterAccount.put(field, selectedValue);
         }
-        return false;
+    
+        // Update merged account with the unique field values
+        update mergedAccount;
     }
     ```
 Please update the code according to your specific external ID field requirements.
+
+## Custom Metadata Type
+1. You could create the Custom Merge Setting by deploy via package.xml
+     ```java
+    <types>
+            <members>Custom_Merge_Settings__mdt</members>
+            <name>CustomObject</name>
+    </types>
+    ```
+2. Then creawte a record for your org and config the following fields
+![Alt text](image-5.png)
+
+## Test coverage
+Current coverage is over 80% but customization might be needed for the following reasons.
+1. Validation Rules
+2. Duplication Rules
+3. Child relations to Accounts
+![Alt text](image-4.png)
 
