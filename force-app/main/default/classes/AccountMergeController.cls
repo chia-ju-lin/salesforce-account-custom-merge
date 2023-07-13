@@ -1,7 +1,7 @@
 public class AccountMergeController {
     
-    public Account masterAccount { get; private set; }
-    public Account mergedAccount { get; private set; }
+    public Account masterAccount { get; set; }
+    public Account mergedAccount { get; set; }
     public Map<String, Object> selectedFieldValues { get; set; }
     public List<String> fieldValues { get; private set; }
     public List<String> differentFields { get; private set; }
