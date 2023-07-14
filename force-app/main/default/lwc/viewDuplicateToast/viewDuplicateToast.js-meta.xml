@@ -5,9 +5,7 @@
      <masterLabel>view duplicate toast</masterLabel>
     <description>view duplicate toast</description>
     <targets>
-        <target>lightning__FlowScreen</target>
-        <target>lightning__AppPage</target>
+        <target>lightning__FlowScreen</target>        
         <target>lightning__RecordPage</target>
-        <target>lightning__HomePage</target>
     </targets>
 </LightningComponentBundle>
