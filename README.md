@@ -6,27 +6,43 @@ The custom merge function is designed to provide a similar functionality to the 
 The custom merge function offers the following functionality:
 
 1. Two different entry points:
- - ID Selection UI
- - View Duplication UI
+ - Free ID input
+ - Select an Account from a Duplication List
 2. Different field values selection:
- - The function displays all fields that have different values between the two accounts for user selection.
+ - The function displays all fields that have different values between the two accounts for merge selection.
  - Fields such as Date, DateTime, and non-editable fields are excluded from the selection.
 3. Merging Process:
- - After clicking the merge button, the following actions are performed:
+   After clicking the merge button, the following actions are performed:
  - All child records associated with the merging accounts are moved to the master account.
  - The selected field values are *updated in the master account.
  - The merged account is removed from the system.
  - In case of any DML (Data Manipulation Language) exceptions, the records are rolled back to their original state.
 4. Field Update Considerations:
- - It's important to note that the *update operation might fail for certain fields defined with unique constraints and additional special rules. Additional implementation might be needed in such use case.
+ - It's important to note that the *update operation might fail for certain fields defined with unique constraints or with special rules. Additional implementation is needed in such use case.
 
-## VF Pages
+## Deployment & Configuration
+- All necessary components are defined in package.xml. 
+- In VS code, right click on manifest/package.xml and select 'SFDX: Deploy Source in Manifest to Org'
+
+## Custom Metadata Type
+1. Create 'Custom Merge Setting' by deploying via package.xml
+     ```java
+    <types>
+            <members>Custom_Merge_Settings__mdt</members>
+            <name>CustomObject</name>
+    </types>
+    ```
+2. Create a record for your environment and config the necessary fields
+![Alt text](image-5.png)
+
+## Implementation Details
+### VF Pages
 
 - force-app/main/default/pages/mergeDuplicateSelection.page
 - force-app/main/default/pages/mergeIDSelection.page
 - force-app/main/default/pages/merge.page
 
-### To link the VF pages to a detail page, follow these steps:
+#### To link the VF pages to a detail page, follow these steps:
 
 1. Go to the Account Object Manager.
 2. Navigate to the "Buttons, Links, and Actions" section.
@@ -34,13 +50,13 @@ The custom merge function offers the following functionality:
 ![Alt text](image-6.png)
 ![Alt text](image-7.png)
 
-## Major Apex classes
+### Major Apex classes
 
 - force-app/main/default/classes/AccountMergeDuplicateController.cls
 - force-app/main/default/classes/AccountMergeEntryController.cls
 - force-app/main/default/classes/AccountMergeController.cls
 
-### Specify foreign key 
+#### Specify foreign key 
 
 To specify the external ID, make the following changes:
 
@@ -67,7 +83,7 @@ To specify the external ID, make the following changes:
     ```
 
 
-### Handle Unique fields
+#### Handle Unique fields
 
 If some fields have unique constrain, need to handle it in this method:
 
@@ -110,19 +126,8 @@ If some fields have unique constrain, need to handle it in this method:
     ```
 Please update the code according to your specific external ID field requirements.
 
-## Custom Metadata Type
-1. You could create the Custom Merge Setting by deploy via package.xml
-     ```java
-    <types>
-            <members>Custom_Merge_Settings__mdt</members>
-            <name>CustomObject</name>
-    </types>
-    ```
-2. Then creawte a record for your org and config the following fields
-![Alt text](image-5.png)
-
 ## Test coverage
-Current coverage is over 80% but customization might be needed for the following reasons.
+Current coverage is over 80%. Customization might be needed for the following reasons.
 1. Validation Rules
 2. Duplication Rules
 3. Child relations to Accounts
