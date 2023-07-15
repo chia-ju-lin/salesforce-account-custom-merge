@@ -2,10 +2,34 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    margin-left: 10px; /* Adjust the margin value as needed */
 }
 
-.container lightning-button {
+.header-title-container {
     margin-bottom: 10px;
 }
 
+.header-title-container .slds-card__header-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.view-duplicates-link {
+    font-size: 16px;
+    color: #3366cc;
+    text-decoration: none;
+}
+
+.view-duplicates-link:hover {
+    text-decoration: underline;
+}
+
+.slds-container {
+    margin-left: 10px; /* Adjust the margin value as needed */
+}
+
+.slds-text-heading_medium {
+    font-weight: bold;
+}
 

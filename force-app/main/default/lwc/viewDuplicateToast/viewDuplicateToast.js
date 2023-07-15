@@ -9,6 +9,10 @@ import getDuplicateAccountsCount from '@salesforce/apex/AccountMergeHelper.getDu
 export default class MyLWCComponent extends NavigationMixin(LightningElement) {
     @api recordId;
 
+    get vfIDPageUrl() {
+        return `/apex/mergeIDSelection?masterAccountId=${this.recordId}`;
+    }
+
     get vfPageUrl() {
         return `/apex/mergeDuplicateSelection?masterAccountId=${this.recordId}`;
     }

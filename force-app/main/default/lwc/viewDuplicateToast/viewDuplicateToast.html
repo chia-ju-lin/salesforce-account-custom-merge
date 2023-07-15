@@ -1,10 +1,17 @@
 <template>
-    <div class="container">
-        
-        <h1>We found {duplicateAccountsCount} potential duplictes of this Account.</h1>
-        <a href={vfPageUrl} target="_blank">View Duplicates</a>
-    </div>
+    <lightning-card>
+        <div class="slds-container">
+            <h2 class="slds-text-heading_medium slds-text-title_bold slds-p-bottom_small">
+                We found {duplicateAccountsCount} potential duplicates of this Account.
+            </h2>
+            <a href={vfPageUrl} target="_blank">View Duplicates</a><br>
+            <a href={vfIDPageUrl} target="_blank">Merge another AccoutID</a>
+        </div>
+    </lightning-card>
 </template>
+
+
+
 
 
 
