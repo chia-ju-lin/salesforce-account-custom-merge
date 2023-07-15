@@ -1,5 +1,6 @@
 public class AccountMergeDuplicateController {
     public List<Account> duplicateAccounts { get; set; }
+    public Integer duplicateCounts { get; set; }
     public String selectedAccountId { get; set; }
     public List<SelectOption> accountOptions { get; set; }
     public String currentAccountId { get; set; }
@@ -14,6 +15,7 @@ public class AccountMergeDuplicateController {
         accountOptions = new List<SelectOption>();
         displayFieldAPINames = new List<String>();
         displayFieldLabels = new List<String>();
+        duplicateCounts = AccountMergeHelper.getDuplicateAccountsCount(currentAccountId);
         loadAccounts();
     }
 

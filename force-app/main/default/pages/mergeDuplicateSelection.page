@@ -3,6 +3,7 @@
 
     <apex:form >
         <apex:pageBlock >
+            <p> There are {!duplicateCounts} potential duplicates. </p>
             <table class="slds-table slds-table_cell-buffer slds-table_bordered">
                 <thead>
                     <tr class="slds-text-title_caps">

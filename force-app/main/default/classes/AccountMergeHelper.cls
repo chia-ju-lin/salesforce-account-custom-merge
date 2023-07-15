@@ -109,7 +109,7 @@ public class AccountMergeHelper {
 
         return displayFieldLabels;
     }
-
+    @AuraEnabled(cacheable=true)
     public static Integer getDuplicateAccountsCount(Id currentAccountId) {
         try {
             // Retrieve the DuplicateRecordSetIds for the current account ID
