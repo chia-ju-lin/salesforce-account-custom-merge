@@ -36,7 +36,7 @@ public class AccountMergeDuplicateController {
             displayFieldLabels.add(accountDescribe.fields.getMap().get(fieldAPIName).getDescribe().getLabel());
         }
 
-        duplicateAccounts = AccountMergeHelper.getDuplicateAccounts(currentAccountId, displayFieldAPINames);
+        duplicateAccounts = AccountMergeHelper.getDuplicateAccounts(currentAccountId);
 
          // Set the first account ID as the default selectedAccountId         
          if (duplicateAccounts.size() > 0) {

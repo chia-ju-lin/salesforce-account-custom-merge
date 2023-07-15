@@ -13,7 +13,7 @@ export default class MyLWCComponent extends NavigationMixin(LightningElement) {
 
     handleButtonClick() {
         const event = new ShowToastEvent({
-            title: 'Potential duplicates',
+            title: 'It looks as if duplicates exist for this Account. ',
             message: '{0}',
             messageData: [
                 {
