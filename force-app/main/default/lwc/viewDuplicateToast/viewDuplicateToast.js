@@ -20,15 +20,42 @@ export default class MyLWCComponent extends NavigationMixin(LightningElement) {
         if (data) {
             this.duplicateAccountsCount = data;
             console.log('***********Duplicate Accounts Count:', this.duplicateAccountsCount); // Check the count value
+            if (this.duplicateAccountsCount !== 0) {
+                this.showDuplicateAccountsToast();
+            }
         } else if (error) {
             console.error('********error: ', error);
         }
+    }
+
+    
+    connectedCallback() {
+        if (this.duplicateAccountsCount !== 0) {
+            this.showDuplicateAccountsToast();
+        }
+    }
+
+    showDuplicateAccountsToast() {
+        const event = new ShowToastEvent({
+            title: 'It looks as if duplicates exist for this Account. a ',
+            message: '{0}',
+            messageData: [
+                {
+                    url: this.vfPageUrl,
+                    label: 'View Duplicates',
+                },
+            ],
+            variant: 'info',
+        });
+
+        this.dispatchEvent(event);
+    
     }
     
 
     handleButtonClick() {
         const event = new ShowToastEvent({
-            title: 'It looks as if duplicates exist for this Account. ',
+            title: 'It looks as if duplicates exist for this Account. b',
             message: '{0}',
             messageData: [
                 {
